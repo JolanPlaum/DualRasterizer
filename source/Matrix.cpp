@@ -190,6 +190,11 @@ namespace dae {
 		return data[3];
 	}
 
+	Matrix Matrix::CreateTransform(const Vector3& t, const Vector3& r, const Vector3& s)
+	{
+		return CreateScale(s) * CreateRotation(r) * CreateTranslation(t);
+	}
+
 	Matrix Matrix::CreateTranslation(float x, float y, float z)
 	{
 		return CreateTranslation({ x, y, z });
