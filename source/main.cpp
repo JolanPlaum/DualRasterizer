@@ -56,8 +56,28 @@ int main(int argc, char* args[])
 				isLooping = false;
 				break;
 			case SDL_KEYUP:
-				//Test for a key
-				//if (e.key.keysym.scancode == SDL_SCANCODE_X)
+				if (e.key.keysym.scancode == SDL_SCANCODE_F1)
+					pRenderer->ToggleRasterizerMode();
+				if (e.key.keysym.scancode == SDL_SCANCODE_F2)
+					pRenderer->ToggleRotation();
+				if (e.key.keysym.scancode == SDL_SCANCODE_F3)
+					pRenderer->ToggleFireFX();
+				if (e.key.keysym.scancode == SDL_SCANCODE_F4)
+					pRenderer->CycleSamplerState();
+				if (e.key.keysym.scancode == SDL_SCANCODE_F5)
+					pRenderer->CycleShadingMode();
+				if (e.key.keysym.scancode == SDL_SCANCODE_F6)
+					pRenderer->ToggleNormalMap();
+				if (e.key.keysym.scancode == SDL_SCANCODE_F7)
+					pRenderer->ToggleDepthBuffer();
+				if (e.key.keysym.scancode == SDL_SCANCODE_F8)
+					pRenderer->ToggleBoundingBox();
+				if (e.key.keysym.scancode == SDL_SCANCODE_F9)
+					pRenderer->CycleCullMode();
+				if (e.key.keysym.scancode == SDL_SCANCODE_F10)
+					pRenderer->ToggleUniformClearColor();
+				if (e.key.keysym.scancode == SDL_SCANCODE_F11)
+					pRenderer->TogglePrintFPS();
 				break;
 			default: ;
 			}
