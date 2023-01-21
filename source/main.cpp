@@ -42,7 +42,6 @@ int main(int argc, char* args[])
 
 	//Start loop
 	pTimer->Start();
-	float printTimer = 0.f;
 	bool isLooping = true;
 	while (isLooping)
 	{
@@ -91,12 +90,6 @@ int main(int argc, char* args[])
 
 		//--------- Timer ---------
 		pTimer->Update();
-		printTimer += pTimer->GetElapsed();
-		if (printTimer >= 1.f)
-		{
-			printTimer = 0.f;
-			std::cout << "dFPS: " << pTimer->GetdFPS() << std::endl;
-		}
 	}
 	pTimer->Stop();
 
