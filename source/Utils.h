@@ -4,6 +4,35 @@
 
 namespace dae
 {
+	namespace BRDF
+	{
+		/**
+		 * \param kd Diffuse Reflection Coefficient
+		 * \param cd Diffuse Color
+		 * \return Lambert Diffuse Color
+		 */
+		static ColorRGB Lambert(float kd, const ColorRGB& cd)
+		{
+			return (cd * kd) / PI;
+		}
+
+		/**
+		 * \param ks Specular Reflection Coefficient
+		 * \param exp Phong Exponent
+		 * \param l Incoming (incident) Light Direction
+		 * \param v View Direction
+		 * \param n Normal of the Surface
+		 * \return Phong Specular Color
+		 */
+		static ColorRGB Phong(ColorRGB ks, float exp, const Vector3& l, const Vector3& v, const Vector3& n)
+		{
+			Vector3 r = l - (n * (2.f * (n * l)));
+			float dot = r * v;
+			if (dot < 0.f) return {};
+			return ks * powf(dot, exp);
+		}
+	}
+
 	namespace Utils
 	{
 		//Just parses vertices and indices
