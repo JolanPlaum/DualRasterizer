@@ -25,8 +25,11 @@ namespace dae
 		//---------------------------
 		// Public Member Functions
 		//---------------------------
-		void Render(ID3D11DeviceContext* pDeviceContext) const;
-		void Render(SDL_Surface* pBackBuffer) const;
+		void RenderHardware(ID3D11DeviceContext* pDeviceContext) const;
+		void RenderSoftware(SDL_Surface* pBackBuffer) const;
+
+		bool ToggleDepthBuffer();
+		bool ToggleBoundingBox();
 
 		void Translate(const Vector3& translation);
 		void Rotate(const Vector3& rotation);

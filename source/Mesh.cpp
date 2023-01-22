@@ -71,7 +71,7 @@ Mesh::~Mesh()
 //-----------------------------------------------------------------
 // Public Member Functions
 //-----------------------------------------------------------------
-void Mesh::Render(ID3D11DeviceContext* pDeviceContext) const
+void Mesh::RenderHardware(ID3D11DeviceContext* pDeviceContext) const
 {
 	//1. Set Primitive Topology
 	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -97,23 +97,34 @@ void Mesh::Render(ID3D11DeviceContext* pDeviceContext) const
 	}
 }
 
-void Mesh::Render(SDL_Surface* pBackBuffer) const
+void Mesh::RenderSoftware(SDL_Surface* pBackBuffer) const
 {
 	//1. Reset Detph Buffer
 	std::fill_n(m_pDepthBufferPixels, pBackBuffer->w * pBackBuffer->h, FLT_MAX);
 
 	//2. Vertex Shading
-	std::vector<Vertex_Out>* pVerticesOut = m_pMaterial->VertexShading(m_Vertices);
+	std::vector<Vertex_Out> verticesOut;
+	m_pMaterial->VertexShading(m_Vertices, verticesOut);
 
 	//3. Render Triangles
 	for (int i{}; i < m_Indices.size() - 2; i += 3)
 	{
 		RenderTriangle(pBackBuffer,
-			(*pVerticesOut)[m_Indices[i]],
-			(*pVerticesOut)[m_Indices[i + 1]],
-			(*pVerticesOut)[m_Indices[i + 2]]
+			verticesOut[m_Indices[i]],
+			verticesOut[m_Indices[i + 1]],
+			verticesOut[m_Indices[i + 2]]
 		);
 	}
+}
+
+bool Mesh::ToggleDepthBuffer()
+{
+	return m_IsShowDepthBuffer = !m_IsShowDepthBuffer;
+}
+
+bool Mesh::ToggleBoundingBox()
+{
+	return m_IsShowBoundingBox = !m_IsShowBoundingBox;
 }
 
 void Mesh::Translate(const Vector3& translation)
@@ -225,6 +236,16 @@ void Mesh::RenderTriangle(SDL_Surface* pBackBuffer, const Vertex_Out& _v0, const
 				ColorRGB finalColor{};
 				if (m_IsShowDepthBuffer)
 				{
+					//Remap the depthbuffer to avoid having everything in white
+					Remap(depthBuffer, 0.995f, 1.f);
+
+					//Clamp the depthbuffer to prevent negative values
+					depthBuffer = Clamp(depthBuffer, 0.f, 1.f);
+
+					finalColor = { depthBuffer,depthBuffer,depthBuffer };
+				}
+				else
+				{
 					Vector3 worldPosition = (w0 * v0.worldPosition + w1 * v1.worldPosition + w2 * v2.worldPosition);
 
 					//Depth correction
@@ -245,16 +266,6 @@ void Mesh::RenderTriangle(SDL_Surface* pBackBuffer, const Vertex_Out& _v0, const
 					temp.worldPosition = worldPosition;
 
 					finalColor = m_pMaterial->PixelShading(temp);
-				}
-				else
-				{
-					//Remap the depthbuffer to avoid having everything in white
-					Remap(depthBuffer, 0.995f, 1.f);
-
-					//Clamp the depthbuffer to prevent negative values
-					depthBuffer = Clamp(depthBuffer, 0.f, 1.f);
-
-					finalColor = { depthBuffer,depthBuffer,depthBuffer };
 				}
 
 				//Update Color in Buffer
