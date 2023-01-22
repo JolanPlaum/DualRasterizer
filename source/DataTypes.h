@@ -8,7 +8,6 @@ namespace dae
 		Vector2 uv{};
 		Vector3 normal{};
 		Vector3 tangent{};
-		ColorRGB color{ colors::White };
 	};
 
 	struct Vertex_Out
@@ -17,7 +16,6 @@ namespace dae
 		Vector2 uv{};
 		Vector3 normal{};
 		Vector3 tangent{};
-		ColorRGB color{ colors::White };
 		Vector3 worldPosition{};
 	};
 }
