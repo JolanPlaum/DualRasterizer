@@ -57,13 +57,14 @@ void Scene::Update(const Timer* pTimer)
 
 	//Update Vehicle
 	Matrix world = m_pVehicle->GetWorldMatrix();
-	m_pVehicle->GetMaterial()->SetMatrix(world * viewProj, "WorldViewProj");
+	Matrix worldViewProj = world * viewProj;
+	m_pVehicle->GetMaterial()->SetMatrix(worldViewProj, "WorldViewProj");
 	m_pVehicle->GetMaterial()->SetMatrix(world, "World");
 	m_pVehicle->GetMaterial()->SetMatrix(invView, "InvView");
 
 	//Update FireFX
-	world = m_pFireFX->GetWorldMatrix();
-	m_pFireFX->GetMaterial()->SetMatrix(world * viewProj, "WorldViewProj");
+	Matrix fireWorldViewProj = m_pFireFX->GetWorldMatrix() * viewProj;
+	m_pFireFX->GetMaterial()->SetMatrix(worldViewProj, "WorldViewProj");
 }
 
 void Scene::RenderHardware(ID3D11DeviceContext* pDeviceContext) const
@@ -130,21 +131,15 @@ void Scene::InitVehicle(ID3D11Device* pDevice, SDL_Surface* pBackBuffer)
 	//1. Create new Material
 	MaterialShading* pVehicleMaterial = new MaterialShading(pDevice, L"Resources/Vehicle.fx");
 
+	//2. Set Textures
+	pVehicleMaterial->SetTexture(new Texture(pDevice, "Resources/vehicle_diffuse.png"), "Diffuse");
+	pVehicleMaterial->SetTexture(new Texture(pDevice, "Resources/vehicle_normal.png"), "Normal");
+	pVehicleMaterial->SetTexture(new Texture(pDevice, "Resources/vehicle_specular.png"), "Specular");
+	pVehicleMaterial->SetTexture(new Texture(pDevice, "Resources/vehicle_gloss.png"), "Gloss");
+
 	//3. Instantiate Mesh
 	m_pVehicle = new Mesh(pDevice, pBackBuffer, "Resources/vehicle.obj", pVehicleMaterial);
 	m_pVehicle->SetPosition(0.f, 0.f, 50.f);
-
-	//2. Set Textures
-	//pVehicleMaterial->SetTexture(new Texture(pDevice, "Resources/vehicle_diffuse.png"), "Diffuse");
-	//pVehicleMaterial->SetTexture(new Texture(pDevice, "Resources/vehicle_normal.png"), "Normal");
-	//pVehicleMaterial->SetTexture(new Texture(pDevice, "Resources/vehicle_specular.png"), "Specular");
-	//pVehicleMaterial->SetTexture(new Texture(pDevice, "Resources/vehicle_gloss.png"), "Gloss");
-
-
-	pVehicleMaterial->SetDiffuseMap(	new Texture(pDevice, "Resources/vehicle_diffuse.png"));
-	pVehicleMaterial->SetNormalMap(		new Texture(pDevice, "Resources/vehicle_normal.png"));
-	pVehicleMaterial->SetSpecularMap(	new Texture(pDevice, "Resources/vehicle_specular.png"));
-	pVehicleMaterial->SetGlossinessMap(	new Texture(pDevice, "Resources/vehicle_gloss.png"));
 }
 
 void Scene::InitFireFX(ID3D11Device* pDevice, SDL_Surface* pBackBuffer)
