@@ -20,6 +20,7 @@ namespace dae
 
 		void Update(const Timer* pTimer);
 		void Render() const;
+		void PrintKeybinds() const;
 
 		//SHARED
 		void ToggleRasterizerMode();
@@ -45,7 +46,7 @@ namespace dae
 
 		bool m_IsInitialized{ false };
 		bool m_IsUniformClearColor{ false };
-		bool m_IsPrintFPS{ true };
+		bool m_IsPrintFPS{ false };
 
 		BYTE m_AttributeFPS{ 8 };
 		BYTE m_AttributeShared{ 6 };

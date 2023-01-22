@@ -31,6 +31,7 @@ namespace dae {
 
 		//Initialize Scene
 		m_pScene = new Scene(m_pDevice, m_pBackBuffer);
+		
 	}
 
 	Renderer::~Renderer()
@@ -87,6 +88,33 @@ namespace dae {
 			RenderSoftware();
 			break;
 		}
+	}
+
+	void Renderer::PrintKeybinds() const
+	{
+		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+		SetConsoleTextAttribute(hConsole, m_AttributeShared);
+		std::cout << "[Key Bindings - SHARED]\n";
+		std::cout << "\t[F1] Toggle Rasterizer Mode(HARDWARE / SOFTWARE)\n";
+		std::cout << "\t[F2]  Toggle Vehicle Rotation(ON / OFF)\n";
+		std::cout << "\t[F9]  Cycle CullMode(BACK / FRONT / NONE)\n";
+		std::cout << "\t[F10] Toggle Uniform ClearColor(ON / OFF)\n";
+		std::cout << "\t[F11] Toggle Print FPS(ON / OFF)\n";
+		std::cout << "\n";
+
+		SetConsoleTextAttribute(hConsole, m_AttributeHardware);
+		std::cout << "[Key Bindings - HARDWARE]\n";
+		std::cout << "\t[F3] Toggle FireFX(ON / OFF)\n";
+		std::cout << "\t[F4] Cycle Sampler State(POINT / LINEAR / ANISOTROPIC)\n";
+		std::cout << "\n";
+
+		SetConsoleTextAttribute(hConsole, m_AttributeSoftware);
+		std::cout << "[Key Bindings - SOFTWARE]\n";
+		std::cout << "\t[F5] Cycle Shading Mode(COMBINED / OBSERVED_AREA / DIFFUSE / SPECULAR)\n";
+		std::cout << "\t[F6] Toggle NormalMap(ON / OFF)\n";
+		std::cout << "\t[F7] Toggle DepthBuffer Visualization(ON / OFF)\n";
+		std::cout << "\t[F8] Toggle BoundingBox Visualization(ON / OFF)\n";
 	}
 
 #pragma region SHARED
