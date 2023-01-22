@@ -52,7 +52,7 @@ namespace dae
 		Matrix m_ProjectionMatrix{};
 
 		const float m_MovementSpeed{ 10.f };
-		const float m_RotationSpeed{ 5.f };
+		const float m_RotationSpeed{ 1.f };
 
 		const float m_Near{ 0.1f };
 		const float m_Far{ 100.f };

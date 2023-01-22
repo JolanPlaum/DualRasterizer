@@ -25,8 +25,8 @@ namespace dae
 		// Public Member Functions
 		//---------------------------
 		void Update(const Timer* pTimer);
-		void RenderHardware(ID3D11DeviceContext* pDeviceContext) const; // (hardware)
-		void RenderSoftware(SDL_Surface* pBackBuffer) const; // (software)
+		void RenderHardware(ID3D11DeviceContext* pDeviceContext) const;
+		void RenderSoftware(SDL_Surface* pBackBuffer) const;
 
 		//SHARED
 		bool ToggleRotation();
@@ -48,7 +48,7 @@ namespace dae
 		Mesh* m_pVehicle{};
 		Mesh* m_pFireFX{};
 
-		bool m_IsRotating{ false };
+		bool m_IsRotating{ true };
 		bool m_IsShowFireFX{ true };
 	
 		//---------------------------

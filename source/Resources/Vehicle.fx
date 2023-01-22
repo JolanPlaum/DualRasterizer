@@ -87,9 +87,7 @@ float3 Phong(float3 ks, float exp, float3 l, float3 v, float3 n)
 {
 	float3 result = reflect(l, n);
 	float dotProduct = saturate(dot(result, v));
-	float temp = (float)pow(dotProduct, exp);
-	return float3(ks.r * temp, ks.g * temp, ks.b * temp);
-	//return ks * pow(dotProduct, exp);
+	return ks * pow(dotProduct, exp);
 }
 
 //---------------------------------------------------
@@ -118,10 +116,6 @@ float3 Shading(VS_OUTPUT input, SamplerState sam)
 	float4 sampledSpecular = gSpecularMap.Sample(sam, input.TextureUV);
 	float4 sampledGlossiness = gGlossMap.Sample(sam, input.TextureUV);
 
-	//finalColor = float3(dotProduct, dotProduct, dotProduct);
-
-	//finalColor += Lambert(gLightIntensity, sampledDiffuse.rgb);
-	//finalColor += Phong(sampledSpecular.rgb, gShininess * sampledGlossiness.r, -gLightDirection, viewDirection, 1.f);
 	finalColor += Lambert(gLightIntensity, sampledDiffuse.rgb) * dotProduct;
 	finalColor += Phong(sampledSpecular.rgb, gShininess * sampledGlossiness.r, -gLightDirection, viewDirection, normalResult) * dotProduct;
 

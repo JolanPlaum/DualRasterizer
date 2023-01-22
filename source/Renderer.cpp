@@ -22,7 +22,6 @@ namespace dae {
 		if (result == S_OK)
 		{
 			m_IsInitialized = true;
-			std::cout << "DirectX is initialized and ready!\n";
 		}
 		else
 		{
