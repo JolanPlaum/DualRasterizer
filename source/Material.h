@@ -26,7 +26,7 @@ namespace dae
 		//---------------------------
 		static ID3DX11Effect* LoadEffect(ID3D11Device* pDevice, const std::wstring& assetFile);
 
-		virtual void SetMatrix(const Matrix& matrix, const std::string& name);
+		virtual void SetMatrix(Matrix& matrix, const std::string& name);
 		virtual void SetTexture(Texture* pTexture, const std::string& name) {};
 
 		ID3DX11Effect* GetEffect() const { return m_pEffect; }
@@ -37,8 +37,8 @@ namespace dae
 		std::string CycleTechnique();
 
 		//SOFTWARE
-		virtual std::vector<Vertex_Out>* VertexShading(const std::vector<Vertex>& vertices_in) {};
-		virtual ColorRGB PixelShading(const Vertex_Out& v) {};
+		virtual void VertexShading(const std::vector<Vertex>& vertices_in, std::vector<Vertex_Out>& vertices_out) {};
+		virtual ColorRGB PixelShading(const Vertex_Out& v) { return ColorRGB(); };
 
 	
 	protected:
@@ -67,7 +67,6 @@ namespace dae
 		//---------------------------
 		// Protected Member Functions
 		//---------------------------
-		uint32_t CreateVertexLayout(D3D11_INPUT_ELEMENT_DESC*& pVertexDesc);
 	
 	};
 }

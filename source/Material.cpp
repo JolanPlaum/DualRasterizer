@@ -16,26 +16,6 @@ Material::Material(ID3D11Device* pDevice, const std::wstring& assetFile)
 	//Load Effect
 	m_pEffect = LoadEffect(pDevice, assetFile);
 
-	//Create Vertex Layout
-	D3D11_INPUT_ELEMENT_DESC* pVertexDesc{};
-	uint32_t numElements = CreateVertexLayout(pVertexDesc);
-
-	//Create Input Layout
-	D3DX11_PASS_DESC passDesc{};
-	m_pTechnique->GetPassByIndex(0)->GetDesc(&passDesc);
-
-	const HRESULT result = pDevice->CreateInputLayout(
-		pVertexDesc,
-		numElements,
-		passDesc.pIAInputSignature,
-		passDesc.IAInputSignatureSize,
-		&m_pInputLayout);
-
-	if (FAILED(result))
-		assert(false);
-
-	delete pVertexDesc;
-
 
 	//Load Techniques
 	m_pTechniquePoint = m_pEffect->GetTechniqueByName("DefaultTechnique");
@@ -57,6 +37,45 @@ Material::Material(ID3D11Device* pDevice, const std::wstring& assetFile)
 	m_pMatWorldViewProjVariable = m_pEffect->GetVariableByName("gWorldViewProj")->AsMatrix();
 	if (!m_pMatWorldViewProjVariable->IsValid())
 		std::wcout << L"Matrix Variable gWorldViewProj not valid\n";
+
+
+	//Create Vertex Layout
+	static constexpr uint32_t numElements{ 4 };
+	D3D11_INPUT_ELEMENT_DESC vertexDesc[numElements]{};
+
+	vertexDesc[0].SemanticName = "POSITION";
+	vertexDesc[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	vertexDesc[0].AlignedByteOffset = 0;
+	vertexDesc[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+
+	vertexDesc[1].SemanticName = "NORMAL";
+	vertexDesc[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	vertexDesc[1].AlignedByteOffset = 12;
+	vertexDesc[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+
+	vertexDesc[2].SemanticName = "TANGENT";
+	vertexDesc[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	vertexDesc[2].AlignedByteOffset = 24;
+	vertexDesc[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+
+	vertexDesc[3].SemanticName = "TEXCOORD";
+	vertexDesc[3].Format = DXGI_FORMAT_R32G32_FLOAT;
+	vertexDesc[3].AlignedByteOffset = 36;
+	vertexDesc[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+
+	//Create Input Layout
+	D3DX11_PASS_DESC passDesc{};
+	m_pTechnique->GetPassByIndex(0)->GetDesc(&passDesc);
+
+	const HRESULT result = pDevice->CreateInputLayout(
+		vertexDesc,
+		numElements,
+		passDesc.pIAInputSignature,
+		passDesc.IAInputSignatureSize,
+		&m_pInputLayout);
+
+	if (FAILED(result))
+		assert(false);
 }
 
 
@@ -159,14 +178,14 @@ std::string Material::CycleTechnique()
 	return "";
 }
 
-void Material::SetMatrix(const Matrix& matrix, const std::string& name)
+void Material::SetMatrix(Matrix& matrix, const std::string& name)
 {
 	if (name == "WorldViewProj")
 	{
 		m_WorldViewProjMat = matrix;
 
 		if (m_pMatWorldViewProjVariable)
-			m_pMatWorldViewProjVariable->SetMatrix(reinterpret_cast<float*>(&m_WorldViewProjMat));
+			m_pMatWorldViewProjVariable->SetMatrix(reinterpret_cast<float*>(&matrix));
 		else
 			std::wcout << L"SetMatrix m_pMatWorldViewProjVariable failed\n";
 	}
@@ -176,31 +195,4 @@ void Material::SetMatrix(const Matrix& matrix, const std::string& name)
 //-----------------------------------------------------------------
 // Protected Member Functions
 //-----------------------------------------------------------------
-uint32_t Material::CreateVertexLayout(D3D11_INPUT_ELEMENT_DESC*& pVertexDesc)
-{
-	static constexpr uint32_t numElements{ 4 };
-	pVertexDesc = new D3D11_INPUT_ELEMENT_DESC[numElements]{};
-
-	pVertexDesc[0].SemanticName = "POSITION";
-	pVertexDesc[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	pVertexDesc[0].AlignedByteOffset = 0;
-	pVertexDesc[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-
-	pVertexDesc[1].SemanticName = "TEXCOORD";
-	pVertexDesc[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-	pVertexDesc[1].AlignedByteOffset = 12;
-	pVertexDesc[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-
-	pVertexDesc[2].SemanticName = "NORMAL";
-	pVertexDesc[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	pVertexDesc[2].AlignedByteOffset = 20;
-	pVertexDesc[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-
-	pVertexDesc[3].SemanticName = "TANGENT";
-	pVertexDesc[3].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	pVertexDesc[3].AlignedByteOffset = 32;
-	pVertexDesc[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-
-	return numElements;
-}
 

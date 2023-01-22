@@ -23,15 +23,15 @@ namespace dae
 		//---------------------------
 		// Public Member Functions
 		//---------------------------
-		virtual void SetMatrix(const Matrix& matrix, const std::string& name) override;
+		virtual void SetMatrix(Matrix& matrix, const std::string& name) override;
 		virtual void SetTexture(Texture* pTexture, const std::string& name) override;
 
 		//SOFTWARE
-		virtual std::vector<Vertex_Out>* VertexShading(const std::vector<Vertex>& vertices_in) override;
+		virtual void VertexShading(const std::vector<Vertex>& vertices_in, std::vector<Vertex_Out>& vertices_out) override;
 		virtual ColorRGB PixelShading(const Vertex_Out& v) override;
 
 		std::string CycleShading();
-		bool ToggleNormal();
+		bool ToggleNormalMap();
 
 	
 	private:
@@ -61,14 +61,14 @@ namespace dae
 
 			//@END
 			END
-		} m_ShadingMode{};
+		} m_ShadingMode{ ShadingMode::Combined };
 		bool m_IsNormalMap{ true };
 	
 		//---------------------------
 		// Private Member Functions
 		//---------------------------		
-		void SetWorldMatrix(const Matrix& matrix);
-		void SetInverseViewMatrix(const Matrix& matrix);
+		void SetWorldMatrix(Matrix& matrix);
+		void SetInverseViewMatrix(Matrix& matrix);
 
 		void SetDiffuse(Texture* pTexture);
 		void SetNormal(Texture* pTexture);

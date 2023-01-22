@@ -67,7 +67,7 @@ MaterialShading::~MaterialShading()
 //-----------------------------------------------------------------
 // Public Member Functions
 //-----------------------------------------------------------------
-void MaterialShading::SetMatrix(const Matrix& matrix, const std::string& name)
+void MaterialShading::SetMatrix(Matrix& matrix, const std::string& name)
 {
 	Material::SetMatrix(matrix, name);
 
@@ -97,16 +97,16 @@ void MaterialShading::SetTexture(Texture* pTexture, const std::string& name)
 	{
 		SetSpecular(pTexture);
 	}
-	else if (name == "Glossiness")
+	else if (name == "Gloss")
 	{
 		SetGlossiness(pTexture);
 	}
 }
 
-std::vector<Vertex_Out>* MaterialShading::VertexShading(const std::vector<Vertex>& vertices_in)
+void MaterialShading::VertexShading(const std::vector<Vertex>& vertices_in, std::vector<Vertex_Out>& vertices_out)
 {
-	std::vector<Vertex_Out>* vertices_out{};
-	vertices_out->reserve(vertices_in.size());
+	vertices_out.clear();
+	vertices_out.reserve(vertices_in.size());
 
 	for (int i{}; i < vertices_in.size(); ++i)
 	{
@@ -121,17 +121,14 @@ std::vector<Vertex_Out>* MaterialShading::VertexShading(const std::vector<Vertex
 		v.position.z /= v.position.w;
 
 		//Set other variables
-		v.color = vertices_in[i].color;
 		v.uv = vertices_in[i].uv;
 		v.normal = m_WorldMat.TransformVector(vertices_in[i].normal);
 		v.tangent = m_WorldMat.TransformVector(vertices_in[i].tangent);
-		v.worldPosition = m_WorldMat.TransformPoint({ vertices_in[i].position, 1.f });
+		v.worldPosition = Vector3(m_WorldMat.TransformPoint({ vertices_in[i].position, 1.f }));
 
 		//Add the new temporary variable to the list
-		vertices_out->emplace_back(v);
+		vertices_out.emplace_back(v);
 	}
-
-	return vertices_out;
 }
 
 ColorRGB MaterialShading::PixelShading(const Vertex_Out& v)
@@ -207,7 +204,7 @@ std::string MaterialShading::CycleShading()
 	return "";
 }
 
-bool MaterialShading::ToggleNormal()
+bool MaterialShading::ToggleNormalMap()
 {
 	return m_IsNormalMap = !m_IsNormalMap;
 }
@@ -216,22 +213,22 @@ bool MaterialShading::ToggleNormal()
 //-----------------------------------------------------------------
 // Private Member Functions
 //-----------------------------------------------------------------
-void MaterialShading::SetWorldMatrix(const Matrix& matrix)
+void MaterialShading::SetWorldMatrix(Matrix& matrix)
 {
 	m_WorldMat = matrix;
 
 	if (m_pMatWorldVariable)
-		m_pMatWorldVariable->SetMatrix(reinterpret_cast<float*>(&m_pMatWorldVariable));
+		m_pMatWorldVariable->SetMatrix(reinterpret_cast<float*>(&matrix));
 	else
 		std::wcout << L"SetMatrix m_pMatWorldVariable failed\n";
 }
 
-void MaterialShading::SetInverseViewMatrix(const Matrix& matrix)
+void MaterialShading::SetInverseViewMatrix(Matrix& matrix)
 {
 	m_InvViewMat = matrix;
 
 	if (m_pMatInvViewVariable)
-		m_pMatInvViewVariable->SetMatrix(reinterpret_cast<float*>(&m_pMatInvViewVariable));
+		m_pMatInvViewVariable->SetMatrix(reinterpret_cast<float*>(&matrix));
 	else
 		std::wcout << L"SetMatrix m_pMatInvViewVariable failed\n";
 }
