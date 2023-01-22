@@ -42,6 +42,27 @@
     <ClInclude Include="DataTypes.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialShading.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialTransparency.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -62,5 +83,26 @@
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="Material.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialShading.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialTransparency.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

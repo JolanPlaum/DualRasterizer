@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Renderer.h"
 #include "Utils.h"
+#include "Scene.h"
 
 namespace dae {
 
@@ -9,6 +10,9 @@ namespace dae {
 	{
 		//Initialize
 		SDL_GetWindowSize(pWindow, &m_Width, &m_Height);
+
+		//Initialize Software pipeline
+		InitializeSoftware();
 
 		//Initialize DirectX pipeline
 		IDXGIFactory1* pDxgiFactory{};
@@ -25,13 +29,13 @@ namespace dae {
 			std::cout << "DirectX initialization failed!\n";
 		}
 
-		//Initialize Software pipeline
-		InitializeSoftware();
+		//Initialize Scene
+		m_pScene = new Scene(m_pDevice, m_pBackBuffer);
 	}
 
 	Renderer::~Renderer()
 	{
-		//if (m_pScene) delete m_pScene;
+		if (m_pScene) delete m_pScene;
 
 		if (m_pRenderTargetView) m_pRenderTargetView->Release();
 		if (m_pRenderTargetBuffer) m_pRenderTargetBuffer->Release();
@@ -52,7 +56,7 @@ namespace dae {
 
 	void Renderer::Update(const Timer* pTimer)
 	{
-		//m_pScene->Update(pTimer);
+		m_pScene->Update(pTimer);
 
 		if (m_IsPrintFPS)
 		{
@@ -99,8 +103,7 @@ namespace dae {
 
 	void Renderer::ToggleRotation()
 	{
-		//TODO: implement function
-		bool isRotating = true;
+		bool isRotating = m_pScene->ToggleRotation();
 
 		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 		SetConsoleTextAttribute(hConsole, m_AttributeShared);
@@ -115,15 +118,7 @@ namespace dae {
 
 		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 		SetConsoleTextAttribute(hConsole, m_AttributeShared);
-		std::string s;
-		switch (cullmode)
-		{
-			//s = "NONE";
-			//s = "FRONT";
-			//s = "BACK";
-		default:
-			break;
-		}
+		std::string s = "NONE";
 		std::cout << "**(SHARED) CullMode = " << s << std::endl;
 	}
 
@@ -146,17 +141,15 @@ namespace dae {
 		std::string s = (m_IsPrintFPS) ? "ON" : "OFF";
 		std::cout << "**(SHARED) Print FPS " << s << std::endl;
 	}
-
-
-	// Private
 #pragma endregion
 
 #pragma region HARDWARE
 	// Public
 	void Renderer::ToggleFireFX()
 	{
-		//TODO: implement function
-		bool isFire = true;
+		if (m_RasterizerMode != RasterizerMode::hardware) return;
+
+		bool isFire = m_pScene->ToggleFireFX();
 
 		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 		SetConsoleTextAttribute(hConsole, m_AttributeHardware);
@@ -166,20 +159,12 @@ namespace dae {
 
 	void Renderer::CycleSamplerState()
 	{
-		//TODO: implement function
-		bool sampler = true;
+		if (m_RasterizerMode != RasterizerMode::hardware) return;
 
 		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 		SetConsoleTextAttribute(hConsole, m_AttributeHardware);
-		std::string s;
-		switch (sampler)
-		{
-			//s = "POINT";
-			//s = "LINEAR";
-			//s = "ANISOTROPIC";
-		default:
-			break;
-		}
+
+		std::string s = m_pScene->CycleSamplerState();
 		std::cout << "**(HARDWARE) Sampler Filter = " << s << std::endl;
 	}
 
@@ -194,7 +179,7 @@ namespace dae {
 		m_pDeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
 		//2. SET PIPELINE + INVOKE DRAWCALLS (= RENDER)
-		//m_pScene->Render(m_pDeviceContext);
+		m_pScene->RenderHardware(m_pDeviceContext);
 
 		//3. PRESENT BACKBUFFER (SWAP)
 		m_pSwapChain->Present(0, 0);
@@ -334,54 +319,48 @@ namespace dae {
 	// Public
 	void Renderer::CycleShadingMode()
 	{
-		//TODO: implement function
-		bool shadingMode = true;
+		if (m_RasterizerMode != RasterizerMode::software) return;
 
 		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 		SetConsoleTextAttribute(hConsole, m_AttributeSoftware);
-		std::string s;
-		switch (shadingMode)
-		{
-			//s = "OBSERVED_AREA";
-			//s = "DIFFUSE";
-			//s = "SPECULAR";
-			//s = "COMBINED";
-		default:
-			break;
-		}
+
+		std::string s = m_pScene->CycleShadingMode();
 		std::cout << "**(SOFTWARE) Shading Mode = " << s << std::endl;
 	}
 
 	void Renderer::ToggleNormalMap()
 	{
-		//TODO: implement function
-		bool isFire = true;
+		if (m_RasterizerMode != RasterizerMode::software) return;
+
+		bool isNormalMap = m_pScene->ToggleNormalMap();
 
 		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 		SetConsoleTextAttribute(hConsole, m_AttributeSoftware);
-		std::string s = (isFire) ? "ON" : "OFF";
+		std::string s = (isNormalMap) ? "ON" : "OFF";
 		std::cout << "**(SOFTWARE) NormalMap " << s << std::endl;
 	}
 
 	void Renderer::ToggleDepthBuffer()
 	{
-		//TODO: implement function
-		bool isFire = true;
+		if (m_RasterizerMode != RasterizerMode::software) return;
+
+		bool isDepthBufferVisual = m_pScene->ToggleDepthBuffer();
 
 		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 		SetConsoleTextAttribute(hConsole, m_AttributeSoftware);
-		std::string s = (isFire) ? "ON" : "OFF";
+		std::string s = (isDepthBufferVisual) ? "ON" : "OFF";
 		std::cout << "**(SOFTWARE) DepthBuffer Visualization " << s << std::endl;
 	}
 
 	void Renderer::ToggleBoundingBox()
 	{
-		//TODO: implement function
-		bool isFire = true;
+		if (m_RasterizerMode != RasterizerMode::software) return;
+
+		bool isBoundingBox = m_pScene->ToggleBoundingBox();
 
 		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 		SetConsoleTextAttribute(hConsole, m_AttributeSoftware);
-		std::string s = (isFire) ? "ON" : "OFF";
+		std::string s = (isBoundingBox) ? "ON" : "OFF";
 		std::cout << "**(SOFTWARE) BoundingBox Visualization " << s << std::endl;
 	}
 
@@ -389,7 +368,24 @@ namespace dae {
 	// Private
 	void Renderer::RenderSoftware() const
 	{
-		//TODO: implement function
+		//1. Lock BackBuffer
+		SDL_LockSurface(m_pBackBuffer);
+
+		//2. Clear Background Color
+		ColorRGB clearColor = m_ClearColorSoftware;
+		if (m_IsUniformClearColor) clearColor = m_ClearColorUniform;
+		SDL_FillRect(m_pBackBuffer, NULL, SDL_MapRGB(m_pBackBuffer->format,
+			static_cast<uint8_t>(clearColor.r * 255),
+			static_cast<uint8_t>(clearColor.g * 255),
+			static_cast<uint8_t>(clearColor.b * 255)));
+
+		//3. Render Scene
+		m_pScene->RenderSoftware(m_pBackBuffer);
+
+		//4. Update SDL Surface
+		SDL_UnlockSurface(m_pBackBuffer);
+		SDL_BlitSurface(m_pBackBuffer, 0, m_pFrontBuffer, 0);
+		SDL_UpdateWindowSurface(m_pWindow);
 	}
 
 	void Renderer::InitializeSoftware()
@@ -397,7 +393,6 @@ namespace dae {
 		//Create Buffers
 		m_pFrontBuffer = SDL_GetWindowSurface(m_pWindow);
 		m_pBackBuffer = SDL_CreateRGBSurface(0, m_Width, m_Height, 32, 0, 0, 0, 0);
-		m_pBackBufferPixels = (uint32_t*)m_pBackBuffer->pixels;
 	}
 #pragma endregion
 

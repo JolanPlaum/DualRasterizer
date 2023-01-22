@@ -5,6 +5,8 @@ struct SDL_Surface;
 
 namespace dae
 {
+	class Scene;
+
 	class Renderer final
 	{
 	public:
@@ -39,6 +41,7 @@ namespace dae
 
 	private:
 		SDL_Window* m_pWindow{};
+		Scene* m_pScene{};
 
 		bool m_IsInitialized{ false };
 		bool m_IsUniformClearColor{ false };
@@ -91,6 +94,5 @@ namespace dae
 
 		SDL_Surface* m_pFrontBuffer{ nullptr };
 		SDL_Surface* m_pBackBuffer{ nullptr };
-		uint32_t* m_pBackBufferPixels{};
 	};
 }
